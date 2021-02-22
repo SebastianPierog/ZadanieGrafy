@@ -293,50 +293,7 @@ namespace ZadanieGrafy
         }
 
         string wynik = "";
-        public void MyFunction()
-        {
-            List<string> helper = new List<string>();
 
-            string max = String.Empty;
-            Test(0, _root);
-
-            if (wynik.Length < 1) Console.WriteLine("Nic się wtym ciagu nie powtarza oprócz pojedynczych znakow");
-            else Console.WriteLine("Największym powtarzajacym się prefixem jest (" + wynik + ")");
-            Console.ReadLine();
-            return;
-
-            void Test(int depth, Node node)
-            {
-                if (depth + 1 > helper.Count) helper.Add("");
-
-                if (node.IsLeaf) return; //jak do nikąd nie idzie to cofaj
-
-                int numberOfNodes = 0;
-                if (node != _AP.ActiveParent) numberOfNodes++;
-
-                var nodeLabel = LabelOf(node);
-                if (node == _AP.ActiveEdge)
-                    nodeLabel = nodeLabel.Insert(_AP.ActiveLength, " | "); //nodeLabel jest tekst
-
-
-
-                for (char c = 'A'; c <= 'z'; c++)
-                {
-                    if (_structure.TryGetValue((node, c), out var childNode))
-                    {
-                        helper[depth] = nodeLabel;
-                        Test(depth + 1, childNode);
-                        numberOfNodes++;
-
-                    }
-                }
-                string temp = String.Empty;
-                for (int i = 0; i < helper.Count; i++) temp += helper[i];
-                if (numberOfNodes >= 1 && temp.Length > wynik.Length) wynik = temp;
-                helper.RemoveAt(depth);
-            }
-
-        }
 
         public int znajdzK(string tekst)
         {
