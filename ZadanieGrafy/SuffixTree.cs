@@ -118,6 +118,27 @@ namespace ZadanieGrafy
             _AP.ActiveParent = _root;
         }
 
+        //MOJE, wczytuje stringa z konsoli
+        public string ReadString()
+        {
+            Console.WriteLine("Podaj ciag znakow:");
+            string value = "^[]";
+            value += Console.ReadLine();
+            value += "^[]";
+            return value;
+        }
+
+        public string ReadStringV2(string arg)
+        {
+            if (!File.Exists(".//" + arg))
+            {
+                Console.WriteLine("Nie ma takiego pliku! Podaj nazwe pliku i rozszerzenie");
+                return null;
+            }
+            string value = File.ReadAllText(".//" + arg);
+            return value + "$";
+        }
+
         private void ExtendTree(char c)
         {
             _chars.Add(c);
@@ -263,7 +284,7 @@ namespace ZadanieGrafy
 
                 sb.AppendLine(new string(' ', depth + 1 - activeOrigin.Length) + activeOrigin + depth + ":" + nodeLabel + openEndMark + linkMark);
 
-                for (char c = 'a'; c <= 'z'; c++)
+                for (char c = 'A'; c <= 'z'; c++)
                 {
                     if (_structure.TryGetValue((node, c), out var childNode))
                         Print(depth + 1, childNode);
@@ -271,12 +292,56 @@ namespace ZadanieGrafy
             }
         }
 
-        public void znajdzK(string tekst)
+        string wynik = "";
+        public void MyFunction()
+        {
+            List<string> helper = new List<string>();
+
+            string max = String.Empty;
+            Test(0, _root);
+
+            if (wynik.Length < 1) Console.WriteLine("Nic się wtym ciagu nie powtarza oprócz pojedynczych znakow");
+            else Console.WriteLine("Największym powtarzajacym się prefixem jest (" + wynik + ")");
+            Console.ReadLine();
+            return;
+
+            void Test(int depth, Node node)
+            {
+                if (depth + 1 > helper.Count) helper.Add("");
+
+                if (node.IsLeaf) return; //jak do nikąd nie idzie to cofaj
+
+                int numberOfNodes = 0;
+                if (node != _AP.ActiveParent) numberOfNodes++;
+
+                var nodeLabel = LabelOf(node);
+                if (node == _AP.ActiveEdge)
+                    nodeLabel = nodeLabel.Insert(_AP.ActiveLength, " | "); //nodeLabel jest tekst
+
+
+
+                for (char c = 'A'; c <= 'z'; c++)
+                {
+                    if (_structure.TryGetValue((node, c), out var childNode))
+                    {
+                        helper[depth] = nodeLabel;
+                        Test(depth + 1, childNode);
+                        numberOfNodes++;
+
+                    }
+                }
+                string temp = String.Empty;
+                for (int i = 0; i < helper.Count; i++) temp += helper[i];
+                if (numberOfNodes >= 1 && temp.Length > wynik.Length) wynik = temp;
+                helper.RemoveAt(depth);
+            }
+
+        }
+
+        public int znajdzK(string tekst)
         {
 
-
-            System.Console.WriteLine("Dla podanego ciagu K = " + znajdzKWewnetrzna(tekst, "", 0, _root));
-            System.Console.ReadLine();
+            return znajdzKWewnetrzna(tekst, "", 0, _root);
 
             int znajdzKWewnetrzna(string txt, string powtorzenie, int wynik, Node node)
             {
@@ -285,35 +350,56 @@ namespace ZadanieGrafy
                     return wynik;
 
                 string temp = LabelOf(childNode);
+                string powtorzenie2 = "";
+                string txt2 = "";
+                if (temp.Length > 1)
+                {
+                    powtorzenie2 = powtorzenie + temp[0] + temp[1];
+                    txt2 = txt.Remove(0, 2);
+                }
                 powtorzenie += temp;
                 txt = txt.Remove(0, temp.Length);
+
+
+
 
                 if (powtorzenie.Length > txt.Length)
                     return wynik;
 
-                for (int j = 0; j < powtorzenie.Length; j++)
+                wynik = znajdzKWewnetrzna(txt, powtorzenie, wynik, childNode);
+
+                if (wynik == 0 && temp.Length > 1)
                 {
-                    if (powtorzenie[j] == txt[j])
+                    for (int j = 0; j < powtorzenie2.Length; j++)
                     {
-                        if (j + 1 == powtorzenie.Length) { wynik = powtorzenie.Length; break; }
+                        if (powtorzenie2[j] == txt2[j])
+                        {
+                            if (j + 1 == powtorzenie2.Length) { wynik = powtorzenie2.Length; break; }
+                        }
+                        else break;
                     }
-                    else break;
                 }
 
-                wynik = znajdzKWewnetrzna(txt, powtorzenie, wynik, childNode);
+                if (wynik == 0)
+                {
+                    for (int j = 0; j < powtorzenie.Length; j++)
+                    {
+                        if (powtorzenie[j] == txt[j])
+                        {
+                            if (j + 1 == powtorzenie.Length) { wynik = powtorzenie.Length; break; }
+                        }
+                        else break;
+                    }
+                }
+
 
                 return wynik;
             }
         }
 
-        public string readFile(string args)
+        public void writeLine(string tekst)
         {
-            if (File.Exists(".\\" + args))
-            {
-                return (File.ReadAllText(".\\" + args) + "$");
-            }
-            else System.Console.WriteLine("Nie ma takiego pliku!");
-            return null;
+            Console.WriteLine("Dla podanego ciagu K wynosi " + tekst);
         }
     }
 }
